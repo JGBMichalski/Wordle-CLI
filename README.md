@@ -14,9 +14,3 @@
 ## Usage
  
 To start the game, simply execute `python3 wordle.py` from the root directory.
-
----
-
-## Word List
-
-The word list contains `5757` words and comes from [Chaz Reid's Five Letter Words Repo](https://github.com/charlesreid1/five-letter-words). Future updates may include this list being updated to an external API.
