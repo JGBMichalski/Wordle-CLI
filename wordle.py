@@ -1,5 +1,6 @@
 # Requires Python 3.10 - This is due to the `match` statement used in the `GetAttemptString` function
 from random import randint
+import requests
 from Classes.Text import Colours
 
 import re
@@ -103,6 +104,18 @@ def AssembleColourAlphabetString(colourArray):
     
     return result
 
+def ValidateWord(word):
+    """
+    Check if the supplied word exists in the dictionary
+    """
+    
+    r = requests.get(f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}")
+
+    if ('title' in r.json()): # If the word exists
+        return False
+    else:
+        return True
+
 if __name__ == "__main__":
     """
     Program's main loop.
@@ -113,7 +126,11 @@ if __name__ == "__main__":
 
     while (True):
         # Request the user's input
-        guess = input("\nEnter your {} attempt: ".format(GetAttemptString(attempts))).strip().upper()
+        guess = input(f"\nEnter your {GetAttemptString(attempts)} attempt: ").strip().upper()
+
+        if (not ValidateWord(guess)): # Ensure that the word is a legitimate word
+            print("Guess is not a valid word.")
+            continue
 
         # Compare the strings and get the resulting character map (Ex: "01200" - See `CHAR_MATCH`, `CHAR_IN_WORD`, and `CHAR_INCORRECT`)
         characterMap = CompareStrings(guess, word)
@@ -128,16 +145,16 @@ if __name__ == "__main__":
 
         # Check if the user won
         if (CHAR_IN_WORD not in characterMap) and (CHAR_INCORRECT not in characterMap):
-            sys.exit("\nYou guessed {} successfully in {} attempts!".format(word, attempts))
+            sys.exit(f"\nYou guessed {word} successfully in {attempts} attempts!")
 
         attempts += 1 # Increase attempts
 
         # End the game if attempts has exceeded the maximum number of attempts
         if (attempts > MAX_ATTEMPTS):
-            sys.exit("\nUh oh. You lost. The word was {}.".format(word))
+            sys.exit(f"\nUh oh. You lost. The word was {word}.")
         
         # Update the colour array to include the new letters guessed
         colourArray = UpdateColourArray(guess, characterMap, colourArray)
 
         # Print out the colour array
-        print("Remaining letters:\n{}".format(AssembleColourAlphabetString(colourArray)))
+        print(f"Remaining letters:\n{AssembleColourAlphabetString(colourArray)}")
